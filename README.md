@@ -4,7 +4,7 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 
 > Los 48 equipos convergen desde el anillo exterior hacia el trofeo del centro. Cada resultado real hace que el ganador se **deslice** con animación hacia la siguiente ronda.
 
-**[🔗 Demo en vivo](https://javierdotdev.github.io/mundial-2026-bracket)** ← reemplaza con tu URL
+**[🔗 Demo en vivo](https://javierdotdev.github.io/world-cup-2026-bracket)** ← reemplaza con tu URL
 
 ---
 
@@ -37,7 +37,7 @@ Es un único archivo estático. Elige una:
 **Opción B — GitHub Pages**
 1. Crea un repositorio y sube `index.html`.
 2. *Settings › Pages › Source:* rama `main`, carpeta `/root`.
-3. Queda en `https://javierdotdev.github.io/mundial-2026-bracket`.
+3. Queda en `https://javierdotdev.github.io/world-cup-2026-bracket`.
 
 No requiere Node, npm ni compilación.
 
