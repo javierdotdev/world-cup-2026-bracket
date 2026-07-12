@@ -168,24 +168,23 @@ const XLINK="http://www.w3.org/1999/xlink";
 // ---- DATOS BASE (fuente de verdad). Orden horario desde arriba. ----
 // [codigo ISO, etiqueta FIFA, nombre]
 const TEAMS = [
-  // Orden = estructura REAL del cuadro: cada par (2m,2m+1) es un partido de 32avos,
-  // y cada dos partidos vecinos forman un cruce de octavos de final (R16).
-  ["za","RSA","Sudáfrica"],  ["ca","CAN","Canadá"],          // 32avos: Sudáfrica-Canadá
-  ["nl","NED","Países Bajos"],["ma","MAR","Marruecos"],      // 32avos: P.Bajos-Marruecos    → R16: Canadá vs Marruecos
-  ["de","GER","Alemania"],   ["py","PAR","Paraguay"],        // 32avos: Alemania-Paraguay
-  ["fr","FRA","Francia"],    ["se","SWE","Suecia"],          // 32avos: Francia-Suecia        → R16: Paraguay vs Francia
-  ["br","BRA","Brasil"],     ["jp","JPN","Japón"],           // 32avos: Brasil-Japón
-  ["ci","CIV","Costa de Marfil"],["no","NOR","Noruega"],     // 32avos: C.Marfil-Noruega      → R16: Brasil vs Noruega
-  ["mx","MEX","México"],     ["ec","ECU","Ecuador"],         // 32avos: México-Ecuador
-  ["gb-eng","ENG","Inglaterra"],["cd","COD","RD Congo"],     // 32avos: Inglaterra-Congo DR   → R16: México vs Inglaterra
-  ["pt","POR","Portugal"],   ["hr","CRO","Croacia"],         // 32avos: Portugal-Croacia
-  ["es","ESP","España"],     ["at","AUT","Austria"],         // 32avos: España-Austria        → R16: Portugal vs España
-  ["us","USA","Estados Unidos"],["ba","BIH","Bosnia"],       // 32avos: USA-Bosnia
-  ["be","BEL","Bélgica"],    ["sn","SEN","Senegal"],         // 32avos: Bélgica-Senegal       → R16: USA vs Bélgica
-  ["ar","ARG","Argentina"],  ["cv","CPV","Cabo Verde"],      // 32avos: Argentina-Cabo Verde
-  ["au","AUS","Australia"],  ["eg","EGY","Egipto"],          // 32avos: Australia-Egipto      → R16: Argentina vs Egipto
-  ["ch","SUI","Suiza"],      ["dz","ALG","Argelia"],         // 32avos: Suiza-Argelia
-  ["co","COL","Colombia"],   ["gh","GHA","Ghana"]            // 32avos: Colombia-Ghana        → R16: Suiza vs Colombia
+  // Orden = estructura REAL del cuadro (32avos → octavos → CUARTOS → semis oficiales).
+  ["za","RSA","Sudáfrica"], ["ca","CAN","Canadá"],
+  ["nl","NED","Países Bajos"], ["ma","MAR","Marruecos"],
+  ["de","GER","Alemania"], ["py","PAR","Paraguay"],
+  ["fr","FRA","Francia"], ["se","SWE","Suecia"],
+  ["pt","POR","Portugal"], ["hr","CRO","Croacia"],
+  ["es","ESP","España"], ["at","AUT","Austria"],
+  ["us","USA","Estados Unidos"], ["ba","BIH","Bosnia"],
+  ["be","BEL","Bélgica"], ["sn","SEN","Senegal"],
+  ["br","BRA","Brasil"], ["jp","JPN","Japón"],
+  ["ci","CIV","Costa de Marfil"], ["no","NOR","Noruega"],
+  ["mx","MEX","México"], ["ec","ECU","Ecuador"],
+  ["gb-eng","ENG","Inglaterra"], ["cd","COD","RD Congo"],
+  ["ar","ARG","Argentina"], ["cv","CPV","Cabo Verde"],
+  ["au","AUS","Australia"], ["eg","EGY","Egipto"],
+  ["ch","SUI","Suiza"], ["dz","ALG","Argelia"],
+  ["co","COL","Colombia"], ["gh","GHA","Ghana"]
 ];
 const CODE2IDX = {}; TEAMS.forEach((t,i)=>CODE2IDX[t[0]]=i);
 const flagURL = c => `https://cdn.jsdelivr.net/gh/HatScripts/circle-flags@gh-pages/flags/${c}.svg`;
@@ -506,8 +505,10 @@ function clearRoute(){
 
 // ---- CALENDARIO DE PARTIDOS PENDIENTES (hora ET) ----
 const SCHEDULE={
-  "1-0":"Sáb 04/07 · 1pm","1-1":"Sáb 04/07 · 5pm","1-2":"Dom 05/07 · 4pm","1-3":"Dom 05/07 · 8pm",
-  "1-4":"Lun 06/07 · 3pm","1-5":"Lun 06/07 · 5pm","1-6":"Mar 07/07 · 12pm","1-7":"Mar 07/07 · 4pm"
+  "1-0":"Sáb 04/07","1-1":"Sáb 04/07","1-2":"Dom 05/07","1-3":"Dom 05/07",
+  "1-4":"Dom 05/07","1-5":"Dom 05/07","1-6":"Mar 07/07","1-7":"Mar 07/07",
+  "2-1":"Vie 10/07","2-2":"Vie 10/07","2-3":"Sáb 11/07 · Kansas City",
+  "3-0":"Semifinal · Dallas 14/07","3-1":"Semifinal · ~14/07","4-0":"FINAL · 19/07"
 };
 function pendingHTML(teamIdx){
   let r=-1,i=-1;
@@ -639,30 +640,35 @@ function advance(r,m,which){
 // ---- RESULTADOS REALES (fuente de verdad). Clave "ronda-partido" ----
 // ronda 0 = octavos. score=[golesSlotA, golesSlotB] · adv=código que avanza · pen=true si por penales · stats opcional ([valSlotA,valSlotB])
 const MATCHES = {
-  "0-0":  {score:[0,1], adv:"ca", pick:[0,1], pts:6},           // Sudáfrica 0-1 Canadá
-  "0-1":  {score:[1,1], adv:"ma", pen:true, pick:[1,1], pts:6}, // P.Bajos 1-1 Marruecos (pen)
-  "0-2":  {score:[1,1], adv:"py", pen:true, pick:[2,0], pts:0}, // Alemania 1-1 Paraguay (pen)
-  "0-3":  {score:[3,0], adv:"fr", pick:[3,1], pts:3},           // Francia 3-0 Suecia
-  "0-4":  {score:[2,1], adv:"br", pick:[2,1], pts:6},           // Brasil 2-1 Japón
-  "0-5":  {score:[1,2], adv:"no", pick:[1,1], pts:0},           // C.Marfil 1-2 Noruega
-  "0-6":  {score:[2,0], adv:"mx", pick:[1,0], pts:3},           // México 2-0 Ecuador
-  "0-7":  {score:[2,1], adv:"gb-eng", pick:[1,0], pts:4},       // Inglaterra 2-1 Congo DR
-  "0-8":  {score:[2,1], adv:"pt", pick:[1,1], pts:0},           // Portugal 2-1 Croacia
-  "0-9":  {score:[3,0], adv:"es", pick:[2,0], pts:3},           // España 3-0 Austria
-  "0-10": {score:[2,0], adv:"us", pick:[2,1], pts:3},           // USA 2-0 Bosnia
-  "0-11": {score:[3,2], adv:"be", aet:true, pick:[1,1], pts:0}, // Bélgica 3-2 Senegal (alargue)
-  "0-12": {score:[3,2], adv:"ar", aet:true, pick:[2,0], pts:3}, // Argentina 3-2 Cabo Verde (alargue)
-  "0-13": {score:[1,1], adv:"eg", pen:true, pick:[0,1], pts:0}, // Australia 1-1 Egipto (pen)
-  "0-14": {score:[2,0], adv:"ch", pick:[2,1], pts:3},           // Suiza 2-0 Argelia
-  "0-15": {score:[1,0], adv:"co", pick:[2,0], pts:3},           // Colombia 1-0 Ghana
-  // --- R16 (octavos de final) ---
-  "1-0": {score:[0,3], adv:"ma", pick:[0,1], pts:3},            // Canadá 0-3 Marruecos
-  "1-1": {score:[0,1], adv:"fr", pick:[0,2], pts:3},            // Paraguay 0-1 Francia
-  "1-2": {score:[1,2], adv:"no", pick:[2,1], pts:0},            // Brasil 1-2 Noruega (UPSET)
-  "1-3": {score:[2,3], adv:"gb-eng", pick:[1,1], pts:0},        // México 2-3 Inglaterra
-  "1-4": {score:[0,1], adv:"es", pick:[0,1], pts:6},            // Portugal 0-1 España ⭐
-  "1-5": {score:[1,4], adv:"be", pick:[2,1], pts:0}             // USA 1-4 Bélgica
-  // "1-6": Argentina vs Egipto · "1-7": Suiza vs Colombia (Mar 07/07)
+  "0-0": {score:[0,1], adv:"ca", pick:[0,1], pts:6},             // Sudáfrica 0-1 Canadá
+  "0-1": {score:[1,1], adv:"ma", pen:true, pick:[1,1], pts:6},   // P.Bajos 1-1 Marruecos (pen)
+  "0-2": {score:[1,1], adv:"py", pen:true, pick:[2,0], pts:0},   // Alemania 1-1 Paraguay (pen)
+  "0-3": {score:[3,0], adv:"fr", pick:[3,1], pts:3},             // Francia 3-0 Suecia
+  "0-4": {score:[2,1], adv:"pt", pick:[1,1], pts:0},             // Portugal 2-1 Croacia
+  "0-5": {score:[3,0], adv:"es", pick:[2,0], pts:3},             // España 3-0 Austria
+  "0-6": {score:[2,0], adv:"us", pick:[2,1], pts:3},             // USA 2-0 Bosnia
+  "0-7": {score:[3,2], adv:"be", aet:true, pick:[1,1], pts:0},   // Bélgica 3-2 Senegal (alargue)
+  "0-8": {score:[2,1], adv:"br", pick:[2,1], pts:6},             // Brasil 2-1 Japón
+  "0-9": {score:[1,2], adv:"no", pick:[1,1], pts:0},             // C.Marfil 1-2 Noruega
+  "0-10": {score:[2,0], adv:"mx", pick:[1,0], pts:3},            // México 2-0 Ecuador
+  "0-11": {score:[2,1], adv:"gb-eng", pick:[1,0], pts:4},        // Inglaterra 2-1 Congo DR
+  "0-12": {score:[3,2], adv:"ar", aet:true, pick:[2,0], pts:3},  // Argentina 3-2 Cabo Verde (alargue)
+  "0-13": {score:[1,1], adv:"eg", pen:true, pick:[0,1], pts:0},  // Australia 1-1 Egipto (pen)
+  "0-14": {score:[2,0], adv:"ch", pick:[2,1], pts:3},            // Suiza 2-0 Argelia
+  "0-15": {score:[1,0], adv:"co", pick:[2,0], pts:3},            // Colombia 1-0 Ghana
+  "1-0": {score:[0,3], adv:"ma", pick:[0,1], pts:3},             // Canadá 0-3 Marruecos
+  "1-1": {score:[0,1], adv:"fr", pick:[0,2], pts:3},             // Paraguay 0-1 Francia
+  "1-2": {score:[0,1], adv:"es", pick:[0,1], pts:6},             // Portugal 0-1 España ⭐
+  "1-3": {score:[1,4], adv:"be", pick:[2,1], pts:0},             // USA 1-4 Bélgica
+  "1-4": {score:[1,2], adv:"no", pick:[2,1], pts:0},             // Brasil 1-2 Noruega (UPSET)
+  "1-5": {score:[2,3], adv:"gb-eng", pick:[1,1], pts:0},         // México 2-3 Inglaterra
+  "1-6": {score:[3,2], adv:"ar", pick:[2,1], pts:4},             // Argentina 3-2 Egipto
+  "1-7": {score:[0,0], adv:"ch", pen:true, pick:[1,2], pts:0},   // Suiza 0-0 Colombia (Suiza por penales)
+  "2-0": {score:[0,2], adv:"fr", pick:[0,2], pts:6},               // Francia 2-0 Marruecos ⭐
+  "2-1": {score:[2,1], adv:"es", pick:[2,1], pts:6},               // España 2-1 Bélgica ⭐
+  "2-2": {score:[1,2], adv:"gb-eng", aet:true, pick:[2,1], pts:0}, // Noruega 1-2 Inglaterra (alargue)
+  "2-3": {score:[3,1], adv:"ar", aet:true, pick:[1,0], pts:3}      // Argentina 3-1 Suiza (alargue)
+  // --- Semis: Francia vs España · Inglaterra vs Argentina (Dallas, ~14/07) ---
 };
 let demoTimers=[];
 function applyRealResults(){
