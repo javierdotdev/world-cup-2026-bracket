@@ -24,6 +24,9 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Ruta iluminada** — resalta el camino de un equipo hacia el título.
 - **Predicciones temporales** — arrastra una bandera a su siguiente nodo para predecir; se guardan en tu navegador y **nunca alteran los datos reales**.
 - **Girar y hacer zoom** — arrastra el fondo para rotar la rueda; las banderas y el trofeo se mantienen derechos.
+- **3er puesto** — mini-cruce dedicado para los perdedores de semis, con ficha, pick y medalla 🥉 al ganador.
+- **Simulación hasta el podio** — un botón simula el resto del torneo (campeón y 3er/4to lugar incluidos) sin tocar los datos reales; *Estado real* lo revierte.
+- **Modo oscuro** — toggle 🌙/☀️ con preferencia guardada en el navegador.
 - **Banderas con doble fuente** — CDN (circle-flags) con copia incrustada de respaldo: funciona hasta sin internet.
 - **Responsive** — se adapta a escritorio y móvil.
 
@@ -34,6 +37,7 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Gira** arrastrando el fondo · **zoom** con la rueda o pellizco.
 - **Toca una bandera** para abrir su ficha (perfil, partido, pick, próximo rival).
 - **Arrastra una bandera** a su siguiente nodo para registrar tu predicción (borde dorado punteado). Arrástrala fuera para quitarla, o usa *✕ Limpiar predicciones*.
+- **▶ Simular el resto** juega hipotéticamente lo que falta (hasta el bronce) · **↺ Estado real** vuelve a la verdad · **🌙/☀️** cambia el tema.
 
 ---
 
@@ -76,7 +80,7 @@ Todo vive en `index.html`. Los datos son objetos JavaScript al inicio del `<scri
 - `PROFILES` — perfil estratégico de cada equipo.
 - `GROUPWINS` — victorias en fase de grupos.
 
-Para cargar un resultado nuevo, agrega una línea a `MATCHES` (ej. `"2-0": {score:[1,0], adv:"ma", pick:[1,1], pts:3}`) y el ganador se anima solo a la siguiente ronda.
+Para cargar un resultado nuevo, agrega una línea a `MATCHES` (ej. `"2-0": {score:[1,0], adv:"ma", pick:[1,1], pts:3}`) y el ganador se anima solo a la siguiente ronda. El partido por el 3er puesto usa la clave especial `"3P"` (los participantes se derivan solos de los perdedores de semis).
 
 ---
 
