@@ -12,11 +12,31 @@
     --dim:#BDB6A8;         /* eliminado / atenuado */
     --gold:#C8A24B;        /* acento único: campeón / trofeo */
     --bg-flag:#D6D0C4;     /* respaldo si una bandera no carga */
+    --muted:var(--muted);       /* textos secundarios */
+    --faint:var(--faint);       /* etiquetas de ronda */
+    --flaglab:var(--flaglab);     /* código de país (fallback) */
+    --slotline:var(--slotline);    /* huecos punteados */
+    --hairline:var(--hairline);    /* separadores */
+    --pill-dim-bg:#cfc9bd; --pill-dim-fg:#544f44; --pill-dim-bd:#a7a092;
+  }
+  body.dark{
+    --paper:#17150F;
+    --ink:#EDE6D6;
+    --line:#D8D1BF;
+    --dim:#57523F;
+    --bg-flag:#2C2921;
+    --muted:#9a927c;
+    --faint:#5f594a;
+    --flaglab:#b8b09a;
+    --slotline:#565040;
+    --hairline:#3a362c;
+    --pill-dim-bg:#3a362c; --pill-dim-fg:#b6ae99; --pill-dim-bd:#565040;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
     background:var(--paper);
+    transition:background .3s;
     color:var(--ink);
     font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;
     display:flex;flex-direction:column;align-items:center;
@@ -38,7 +58,7 @@
     font-size:11px;
     letter-spacing:0.18em;
     text-transform:uppercase;
-    color:#7c766a;
+    color:var(--muted);
     font-weight:600;
   }
   .controls{
@@ -56,7 +76,7 @@
   button:hover{background:var(--ink);color:var(--paper)}
   button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
   .hint{
-    font-size:11px;color:#8a8478;letter-spacing:0.02em;
+    font-size:11px;color:var(--muted);letter-spacing:0.02em;
   }
   .stage-wrap{
     flex:1;width:100%;display:flex;align-items:center;justify-content:center;
@@ -66,24 +86,28 @@
   svg.dragging{cursor:grabbing}
   .anim{transition:transform 1.5s cubic-bezier(.33,0,.18,1)}
   .reduced .anim{transition:none}
-  .flaglabel{fill:#5a5448;font-weight:700;font-family:inherit;user-select:none}
+  .flaglabel{fill:var(--flaglab);font-weight:700;font-family:inherit;user-select:none}
   .node.dim{opacity:1}
   .node.dim image{filter:grayscale(1) contrast(.45) brightness(1.3)}
-  .node.dim .ring{stroke:#b9b2a4}
+  .node.dim .ring{stroke:var(--slotline)}
   .node.dim .flaglabel{opacity:.5}
   .branch{stroke:var(--line);stroke-width:1.3;opacity:.4;fill:none;stroke-linejoin:round;stroke-linecap:round}
   .routeseg{fill:none;stroke:var(--gold);stroke-width:3.4;opacity:.55;stroke-dasharray:5 7;stroke-linejoin:round;stroke-linecap:round}
   .routeseg.gone{stroke-dasharray:none;opacity:.95}
   .node.fade{opacity:1}
   .node.fade image{filter:grayscale(1) contrast(.28) brightness(1.45)}
-  .node.fade .ring{stroke:#cfc9bc}
+  .node.fade .ring{stroke:var(--slotline)}
   .node.fade .flaglabel{opacity:.3}
-  .ringlabel{font-size:12.5px;letter-spacing:.4em;font-weight:700;fill:#b6af9f}
+  .ringlabel{font-size:12.5px;letter-spacing:.4em;font-weight:700;fill:var(--faint)}
   .node.pred{opacity:.92}
   .node.pred .ring{stroke:var(--gold);stroke-width:2.4;stroke-dasharray:5 4}
   .ghost{opacity:.75;pointer-events:none}
   .slot.target{stroke:var(--gold);stroke-width:3;stroke-dasharray:none}
-  .slot{fill:var(--paper);stroke:#b9b2a4;stroke-width:1.4;stroke-dasharray:3 4}
+  .p3label{font-size:11px;letter-spacing:.3em;font-weight:800;fill:var(--faint)}
+  .p3vs{font-size:11px;font-weight:700;fill:var(--muted)}
+  .p3info{font-size:10.5px;fill:var(--muted)}
+  .p3score{font-size:16px;font-weight:800;fill:var(--ink)}
+  .slot{fill:var(--paper);stroke:var(--slotline);stroke-width:1.4;stroke-dasharray:3 4}
   .slot.champ{stroke:var(--gold);stroke-width:2.2;stroke-dasharray:none}
   .champ-glyph{font-size:46px;text-anchor:middle;dominant-baseline:central}
   .info{
@@ -105,29 +129,29 @@
   .card .top{display:flex;align-items:center;gap:12px}
   .card .cf{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--ink);background:var(--bg-flag)}
   .card .nm{font-size:18px;font-weight:800;line-height:1.1}
-  .card .meta{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8a8478;font-weight:700;margin-top:3px}
+  .card .meta{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:3px}
   .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:13px}
   .pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;border:1.4px solid var(--ink)}
   .pill.lvl-A{background:var(--gold);border-color:var(--gold);color:#3a2e10}
   .pill.lvl-B{background:#2f6b4f;border-color:#2f6b4f;color:#fff}
-  .pill.lvl-D,.pill.lvl-E{background:#cfc9bd;border-color:#a7a092;color:#544f44}
+  .pill.lvl-D,.pill.lvl-E{background:var(--pill-dim-bg);border-color:var(--pill-dim-bd);color:var(--pill-dim-fg)}
   .row{font-size:13px;margin-top:11px;line-height:1.45}
-  .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#8a8478;font-weight:700}
-  .stats{margin-top:11px;border-top:1px solid #d8d2c5;padding-top:6px}
+  .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .stats{margin-top:11px;border-top:1px solid var(--hairline);padding-top:6px}
   .srow{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;padding:3px 0}
-  .srow .sl{color:#8a8478;font-size:11px;flex:1;text-align:center}
+  .srow .sl{color:var(--muted);font-size:11px;flex:1;text-align:center}
   .srow span:first-child,.srow span:last-child{font-weight:700;min-width:46px}
   .srow span:first-child{text-align:left}
   .srow span:last-child{text-align:right}
-  .srow.shead span{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:#8a8478;font-weight:700}
+  .srow.shead span{font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700}
   .ppill{font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:1px}
   .ppill.p6{background:#2f6b4f;color:#fff}
   .ppill.p4{background:#2c5d8f;color:#fff}
   .ppill.p3{background:var(--gold);color:#3a2e10}
   .ppill.p0{background:#b0483f;color:#fff}
-  .close{position:absolute;top:9px;right:11px;border:none;background:none;font-size:18px;color:#8a8478;padding:5px;cursor:pointer}
+  .close{position:absolute;top:9px;right:11px;border:none;background:none;font-size:18px;color:var(--muted);padding:5px;cursor:pointer}
   .close:hover{background:none;color:var(--ink)}
-  footer{font-size:10.5px;color:#9a9488;padding:6px 12px 10px;text-align:center;letter-spacing:0.04em}
+  footer{font-size:10.5px;color:var(--muted);padding:6px 12px 10px;text-align:center;letter-spacing:0.04em}
   .node{cursor:pointer}
 </style>
 </head>
@@ -139,6 +163,7 @@
       <button id="play">▶ Simular el resto</button>
       <button id="reset">↺ Estado real</button>
       <button id="clearpred">✕ Limpiar predicciones</button>
+      <button id="theme">🌙 Oscuro</button>
       <span class="hint">Gira arrastrando el fondo · arrastra una bandera al siguiente nodo para predecir</span>
     </div>
   </header>
@@ -154,6 +179,7 @@
         <g id="preds"></g>
         <g id="champ"></g>
       </g>
+      <g id="third"></g>
     </svg>
   </div>
 
@@ -318,6 +344,7 @@ const $flags=document.getElementById("flags");
 const $champ=document.getElementById("champ");
 const $route=document.getElementById("route");
 const $preds=document.getElementById("preds");
+const $third=document.getElementById("third");
 const $stage=document.getElementById("stage");
 const $svg=document.getElementById("svg");
 const $info=document.getElementById("info");
@@ -333,14 +360,23 @@ function polar(angDeg, radius){
   const a=(angDeg-90)*Math.PI/180;
   return {x:CX+radius*Math.cos(a), y:CY+radius*Math.sin(a)};
 }
+function elbowPath(child, foot, parent, k=18){
+  // codo con esquina redondeada (filete cuadrático en el giro)
+  const d1=Math.hypot(foot.x-child.x,foot.y-child.y);
+  const d2=Math.hypot(parent.x-foot.x,parent.y-foot.y);
+  if(d1<0.5||d2<0.5) return `M ${child.x} ${child.y} L ${parent.x} ${parent.y}`;
+  const t1=Math.min(k,d1/2), t2=Math.min(k,d2/2);
+  const p1x=foot.x+(child.x-foot.x)*t1/d1, p1y=foot.y+(child.y-foot.y)*t1/d1;
+  const p2x=foot.x+(parent.x-foot.x)*t2/d2, p2y=foot.y+(parent.y-foot.y)*t2/d2;
+  return `M ${child.x} ${child.y} L ${p1x.toFixed(1)} ${p1y.toFixed(1)} Q ${foot.x} ${foot.y} ${p2x.toFixed(1)} ${p2y.toFixed(1)} L ${parent.x} ${parent.y}`;
+}
 function drawLines(){
   $lines.innerHTML="";
   for(let r=1;r<RINGS;r++){
     pos[r].forEach((p,m)=>{
       [pos[r-1][2*m], pos[r-1][2*m+1]].forEach(child=>{
-        // baja en línea recta (radial) desde el hijo hasta el anillo del padre, luego gira al nodo
         const foot=polar(child.ang, RADII[r]);
-        el("path",{d:`M ${child.x} ${child.y} L ${foot.x} ${foot.y} L ${p.x} ${p.y}`,class:"branch"},$lines);
+        el("path",{d:elbowPath(child,foot,p),class:"branch"},$lines);
       });
     });
   }
@@ -417,6 +453,8 @@ function getProgress(teamIdx){
     if(nxt!=null && nxt!==teamIdx){eliminated=true; elimRound=names[deepest];}
   }
   if(deepest===RINGS-1) return `🏆 Campeón`;
+  const tp3=MATCHES["3P"];
+  if(eliminated && elimRound==="Semis" && tp3 && CODE2IDX[tp3.adv]===teamIdx) return `🥉 3er lugar del Mundial`;
   if(eliminated)        return `Eliminado en ${elimRound}`;
   return `En ${names[deepest]} · a ${5-deepest} ronda${5-deepest===1?"":"s"} del título`;
 }
@@ -434,7 +472,20 @@ function matchOf(teamIdx){
 }
 const STAT_DEFS=[["Posesión","posesion","%"],["Remates","remates",""],["Remates al arco","rematesArco",""],
   ["Pases","pases",""],["Precisión pases","precision","%"],["Faltas","faltas",""],["Córners","corners",""],["Amarillas","amarillas",""]];
+function pickPillHTML(md){
+  if(!md.pick) return "";
+  const [pa,pb]=md.pick, pts=md.pts;
+  const cls = pts>=6?"p6":pts>=4?"p4":pts>=3?"p3":"p0";
+  const tag = pts>=6?"+6 ⭐ Exacto":pts>=4?"+4 Gan+Dif":pts>=3?"+3 Tendencia":"0 Falló";
+  return `<div class="row"><span class="k">Mi pick (quiniela)</span><br>${pa}–${pb} <span class="ppill ${cls}">${tag}</span></div>`;
+}
 function matchHTML(teamIdx){
+  const tp=MATCHES["3P"], tl=semiLosers();
+  if(tp && tl && (tl[0]===teamIdx || tl[1]===teamIdx)){
+    let head=`${TEAMS[tl[0]][2]} ${tp.score[0]}–${tp.score[1]} ${TEAMS[tl[1]][2]}`;
+    if(tp.aet) head+=" · definido en el alargue";
+    return `<div class="row"><span class="k">Partido (3er puesto) 🥉</span><br>${head}</div>`+pickPillHTML(tp);
+  }
   const mm=matchOf(teamIdx);
   if(!mm) return "";
   const na=TEAMS[mm.a][2], nb=TEAMS[mm.b][2];
@@ -444,12 +495,7 @@ function matchHTML(teamIdx){
   if(mm.md.pen) head += ` · ${TEAMS[CODE2IDX[mm.md.adv]][2]} por penales`;
   if(mm.md.aet) head += ` · definido en el alargue`;
   let html=`<div class="row"><span class="k">Partido (${RNAMES[mm.r]})</span><br>${head}</div>`;
-  if(mm.md.pick){
-    const [pa,pb]=mm.md.pick, pts=mm.md.pts;
-    const cls = pts>=6?"p6":pts>=4?"p4":pts>=3?"p3":"p0";
-    const tag = pts>=6?"+6 ⭐ Exacto":pts>=4?"+4 Gan+Dif":pts>=3?"+3 Tendencia":"0 Falló";
-    html+=`<div class="row"><span class="k">Mi pick (quiniela)</span><br>${pa}–${pb} <span class="ppill ${cls}">${tag}</span></div>`;
-  }
+  html+=pickPillHTML(mm.md);
   if(mm.md.stats){
     const s=mm.md.stats;
     const rows=STAT_DEFS.filter(d=>s[d[1]]).map(d=>{
@@ -488,7 +534,7 @@ function highlightPath(teamIdx){
     const child=pos[r][idx], par=pos[r+1][parent];
     const foot=polar(child.ang,RADII[r+1]);
     const traveled = state[r+1][parent]===teamIdx;
-    el("path",{d:`M ${child.x} ${child.y} L ${foot.x} ${foot.y} L ${par.x} ${par.y}`,
+    el("path",{d:elbowPath(child,foot,par),
       class:"routeseg"+(traveled?" gone":"")},$route);
     idx=parent;
   }
@@ -511,6 +557,11 @@ const SCHEDULE={
   "3-0":"Semifinal · Dallas 14/07","3-1":"Semifinal · ~14/07","4-0":"FINAL · 19/07"
 };
 function pendingHTML(teamIdx){
+  const tl=semiLosers();
+  if(tl && !MATCHES["3P"] && (tl[0]===teamIdx || tl[1]===teamIdx)){
+    const opp = tl[0]===teamIdx? tl[1] : tl[0];
+    return `<div class="row"><span class="k">Próximo partido</span><br>3er puesto vs ${TEAMS[opp][2]} · Sáb 18/07</div>`;
+  }
   let r=-1,i=-1;
   for(let k=0;k<RINGS;k++){const x=state[k].indexOf(teamIdx); if(x>=0){r=k;i=x;}}
   if(r<0 || r===RINGS-1) return "";
@@ -520,6 +571,55 @@ function pendingHTML(teamIdx){
   const when=SCHEDULE[`${r}-${m}`];
   const oppTxt=opp!=null? "vs "+TEAMS[opp][2] : "rival por definir";
   return `<div class="row"><span class="k">Próximo partido</span><br>${oppTxt}${when? " · "+when : ""}</div>`;
+}
+
+// ---- 3ER PUESTO (perdedores de semis) ----
+function semiLosers(){
+  const out=[];
+  for(const [k,m] of [["3-0",0],["3-1",1]]){
+    const md=MATCHES[k]; if(!md) return null;
+    const a=state[3][2*m], b=state[3][2*m+1];
+    if(a==null||b==null) return null;
+    out.push(CODE2IDX[md.adv]===a ? b : a);
+  }
+  return out;
+}
+function cornerFlag(teamIdx,x,y,diam){
+  const t=TEAMS[teamIdx];
+  const g=el("g",{class:"node",transform:`translate(${x} ${y})`},$third);
+  const r=diam/2;
+  el("circle",{r:r,fill:"var(--bg-flag)"},g);
+  const lab=el("text",{class:"flaglabel","text-anchor":"middle","dominant-baseline":"central","font-size":r*0.6,y:1},g);
+  lab.textContent=t[1];
+  const img=el("image",{x:-r,y:-r,width:diam,height:diam},g);
+  setFlag(img,t[0]);
+  el("circle",{r:r,fill:"none",stroke:"var(--ink)","stroke-width":1.5,class:"ring"},g);
+  const ttl=document.createElementNS(SVGNS,"title"); ttl.textContent=t[2]; g.appendChild(ttl);
+  g.addEventListener("click",()=>openCard(teamIdx));
+  return g;
+}
+function renderThird(){
+  $third.innerHTML="";
+  const Y=902, XA=92, XB=168, D=46;
+  const tt=el("text",{x:130,y:852,class:"p3label","text-anchor":"middle"},$third); tt.textContent="3ER PUESTO";
+  const losers=semiLosers(), tp=MATCHES["3P"];
+  const vs=el("text",{x:130,y:Y+1,class:"p3vs","text-anchor":"middle","dominant-baseline":"central"},$third); vs.textContent="vs";
+  if(!losers){
+    [XA,XB].forEach(x=>el("circle",{cx:x,cy:Y,r:D/2,class:"slot"},$third));
+    const i1=el("text",{x:130,y:Y+44,class:"p3info","text-anchor":"middle"},$third); i1.textContent="perdedores de semis";
+    const i2=el("text",{x:130,y:Y+61,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
+    return;
+  }
+  const [A,B]=losers;
+  const ga=cornerFlag(A,XA,Y,D), gb=cornerFlag(B,XB,Y,D);
+  if(tp){
+    const sc=el("text",{x:130,y:Y+46,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${tp.score[0]}–${tp.score[1]}`;
+    const winA = CODE2IDX[tp.adv]===A;
+    (winA? gb : ga).classList.add("dim");
+    const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
+  } else {
+    const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
+  }
 }
 
 // ---- ABRIR / CERRAR FICHA ----
@@ -598,6 +698,7 @@ function render(){
     }
   });
   applyStage();
+  renderThird();
 }
 
 // ---- AVANCE DE UN GANADOR ----
@@ -669,6 +770,7 @@ const MATCHES = {
   "2-2": {score:[1,2], adv:"gb-eng", aet:true, pick:[2,1], pts:0}, // Noruega 1-2 Inglaterra (alargue)
   "2-3": {score:[3,1], adv:"ar", aet:true, pick:[1,0], pts:3}      // Argentina 3-1 Suiza (alargue)
   // --- Semis: Francia vs España · Inglaterra vs Argentina (Dallas, ~14/07) ---
+  // "3-0": SF1 · "3-1": SF2 · "3P": 3er puesto (perdedores de semis, 18/07) · "4-0": FINAL 19/07
 };
 let demoTimers=[];
 function applyRealResults(){
@@ -788,6 +890,7 @@ function renderPredictions(){
   if(g && state[RINGS-1][0]==null){
     g.style.display = (effAt(RINGS-1,0)? "none" : "");
   }
+  renderThird();
   applyStage();
 }
 
@@ -919,6 +1022,17 @@ document.getElementById("reset").addEventListener("click",resetBracket);
 document.getElementById("clearpred").addEventListener("click",()=>{
   predictions={}; savePredictions(); renderPredictions();
 });
+function setTheme(dark){
+  document.body.classList.toggle("dark",dark);
+  const b=document.getElementById("theme");
+  if(b) b.textContent = dark? "☀️ Claro" : "🌙 Oscuro";
+}
+document.getElementById("theme").addEventListener("click",()=>{
+  const d=!document.body.classList.contains("dark");
+  setTheme(d);
+  store.set("wc26-theme", d? "dark":"light");
+});
+(async()=>{ try{ const v=await store.get("wc26-theme"); if(v==="dark") setTheme(true); }catch(e){} })();
 drawLines();
 drawSlots();
 drawRingLabels();
