@@ -35,6 +35,8 @@
   body.dark .slot{stroke-width:1.7}
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
+  *{-webkit-tap-highlight-color:transparent}
+  svg, header, footer, .info{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
   body{
     background:var(--paper);
     transition:background .3s;
@@ -89,14 +91,16 @@
   .reduced .anim{transition:none}
   .flaglabel{fill:var(--flaglab);font-weight:700;font-family:inherit;user-select:none}
   .node.dim{opacity:1}
-  .node.dim image{filter:grayscale(1) contrast(.45) brightness(1.3)}
+  .node.dim image{filter:url(#f-dim)}
+  body.dark .node.dim image{filter:url(#f-dim-dark)}
   .node.dim .ring{stroke:var(--slotline)}
   .node.dim .flaglabel{opacity:.5}
   .branch{stroke:var(--line);stroke-width:1.3;opacity:.4;fill:none;stroke-linejoin:round;stroke-linecap:round}
   .routeseg{fill:none;stroke:var(--gold);stroke-width:3.4;opacity:.55;stroke-dasharray:5 7;stroke-linejoin:round;stroke-linecap:round}
   .routeseg.gone{stroke-dasharray:none;opacity:.95}
   .node.fade{opacity:1}
-  .node.fade image{filter:grayscale(1) contrast(.28) brightness(1.45)}
+  .node.fade image{filter:url(#f-fade)}
+  body.dark .node.fade image{filter:url(#f-fade-dark)}
   .node.fade .ring{stroke:var(--slotline)}
   .node.fade .flaglabel{opacity:.3}
   .ringlabel{font-size:12.5px;letter-spacing:.4em;font-weight:700;fill:var(--faint)}
@@ -127,6 +131,25 @@
     transition:transform .4s cubic-bezier(.33,0,.18,1);z-index:10;
   }
   .card.show{transform:translate(-50%,0)}
+  /* scroll de la card a juego con el diseño */
+  .card{scrollbar-width:thin;scrollbar-color:var(--slotline) transparent}
+  .card::-webkit-scrollbar{width:8px}
+  .card::-webkit-scrollbar-track{background:transparent;margin:14px 0}
+  .card::-webkit-scrollbar-thumb{background:var(--slotline);border-radius:999px;border:2px solid var(--paper)}
+  .card::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+  @media (max-width:899px){
+    .card{max-height:44vh}
+  }
+  @media (min-width:900px){
+    .card{
+      left:auto;right:18px;bottom:18px;
+      width:340px;max-height:72vh;
+      transform:translate(0,calc(100% + 40px));
+      border-bottom:1.5px solid var(--ink);border-radius:16px;
+      box-shadow:0 12px 34px rgba(0,0,0,.16);
+    }
+    .card.show{transform:translate(0,0)}
+  }
   .card .top{display:flex;align-items:center;gap:12px}
   .card .cf{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--ink);background:var(--bg-flag)}
   .card .nm{font-size:18px;font-weight:800;line-height:1.1}
@@ -171,6 +194,13 @@
 
   <div class="stage-wrap">
     <svg id="svg" viewBox="0 0 1000 1000" role="img" aria-label="Cuadro de eliminatorias del Mundial 2026">
+      <defs>
+        <!-- Filtros SVG nativos: Safari/iOS no aplica filter CSS sobre elementos SVG -->
+        <filter id="f-dim"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.585" intercept="0.3575"/><feFuncG type="linear" slope="0.585" intercept="0.3575"/><feFuncB type="linear" slope="0.585" intercept="0.3575"/></feComponentTransfer></filter>
+        <filter id="f-fade"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.406" intercept="0.522"/><feFuncG type="linear" slope="0.406" intercept="0.522"/><feFuncB type="linear" slope="0.406" intercept="0.522"/></feComponentTransfer></filter>
+        <filter id="f-dim-dark"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.375" intercept="0.1875"/><feFuncG type="linear" slope="0.375" intercept="0.1875"/><feFuncB type="linear" slope="0.375" intercept="0.1875"/></feComponentTransfer></filter>
+        <filter id="f-fade-dark"><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncR type="linear" slope="0.22" intercept="0.10"/><feFuncG type="linear" slope="0.22" intercept="0.10"/><feFuncB type="linear" slope="0.22" intercept="0.10"/></feComponentTransfer></filter>
+      </defs>
       <g id="stage">
         <g id="ringlabels"></g>
         <g id="lines"></g>
@@ -579,14 +609,55 @@ function pendingHTML(teamIdx){
 // ---- 3ER PUESTO (perdedores de semis) ----
 let simThird=null;   // 🥉 simulado (transitorio, jamás toca MATCHES)
 function semiLosers(){
-  // los perdedores se derivan del ESTADO: funciona con semis reales o simuladas
-  const out=[];
+  // perdedores derivados del estado EFECTIVO: sirve con semis reales, simuladas o PREDICHAS
+  const out=[]; let anyPred=false;
   for(let m=0;m<2;m++){
-    const a=state[3][2*m], b=state[3][2*m+1], w=state[4][m];
-    if(a==null||b==null||w==null) return null;
-    out.push(w===a ? b : a);
+    const A=effAt(3,2*m), B=effAt(3,2*m+1), W=effAt(4,m);
+    if(!A||!B||!W) return null;
+    anyPred = anyPred || A.pred || B.pred || W.pred;
+    out.push(W.idx===A.idx ? B.idx : A.idx);
   }
+  out.pred=anyPred;
   return out;
+}
+let bdrag=null, bronzeSlotEl=null;
+function svgPointFixed(ev){
+  const r=$svg.getBoundingClientRect();
+  return {x:(ev.clientX-r.left)/r.width*1000, y:(ev.clientY-r.top)/r.height*1000};
+}
+function bronzePointerDown(ev,teamIdx,homeX,homeY){
+  ev.stopPropagation();
+  moved=false;
+  bdrag={teamIdx,homeX,homeY,started:false,ghost:null};
+}
+function bronzeMove(ev){
+  const p=svgPointFixed(ev);
+  if(!bdrag.started){
+    if(Math.hypot(p.x-bdrag.homeX, p.y-bdrag.homeY) < 8) return;
+    bdrag.started=true; moved=true;
+    try{ $svg.setPointerCapture(ev.pointerId); }catch(e){}
+    bdrag.ghost=makeGhost(bdrag.teamIdx,40,$third);
+    if(bronzeSlotEl) bronzeSlotEl.classList.add("target");
+  }
+  bdrag.ghost.setAttribute("transform",`translate(${p.x.toFixed(1)} ${p.y.toFixed(1)})`);
+}
+function bronzeUp(ev){
+  const b=bdrag; bdrag=null;
+  if(!b || !b.started) return;                       // tap: el click abre la ficha
+  if(b.ghost) b.ghost.remove();
+  if(bronzeSlotEl) bronzeSlotEl.classList.remove("target");
+  const p=svgPointFixed(ev);
+  const hit = Math.hypot(p.x-130, p.y-946) <= 34;    // soltó sobre el slot 🥉
+  const code=TEAMS[b.teamIdx][0];
+  if(hit) predictions["3P"]=code;
+  else if(predictions["3P"]===code) delete predictions["3P"];  // arrastrar fuera = quitar
+  prunePredictions(); savePredictions(); renderThird();
+}
+function bronzeCancel(){
+  if(!bdrag) return;
+  if(bdrag.ghost) bdrag.ghost.remove();
+  if(bronzeSlotEl) bronzeSlotEl.classList.remove("target");
+  bdrag=null;
 }
 function stageToSvg(pt){
   // coordenadas del stage (rotado/zoomeado) → coordenadas fijas del SVG
@@ -606,7 +677,7 @@ function cornerFlag(teamIdx,x,y,diam,fromPt){
   setFlag(img,t[0]);
   el("circle",{r:r,fill:"none",stroke:"var(--ink)","stroke-width":1.5,class:"ring"},an);
   const ttl=document.createElementNS(SVGNS,"title"); ttl.textContent=t[2]; g.appendChild(ttl);
-  g.addEventListener("click",()=>openCard(teamIdx));
+  g.addEventListener("click",()=>{ if(moved) return; openCard(teamIdx); });
   if(fromPt && !reduced){
     an.setAttribute("transform",`translate(${(fromPt.x-x).toFixed(1)} ${(fromPt.y-y).toFixed(1)}) scale(.78)`);
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
@@ -617,6 +688,7 @@ function cornerFlag(teamIdx,x,y,diam,fromPt){
 }
 function renderThird(animate){
   $third.innerHTML="";
+  bronzeSlotEl=null;
   const Y=902, XA=92, XB=168, D=46;
   const tt=el("text",{x:130,y:852,class:"p3label","text-anchor":"middle"},$third); tt.textContent="3ER PUESTO";
   const losers=semiLosers(), tp=MATCHES["3P"];
@@ -629,9 +701,11 @@ function renderThird(animate){
   }
   const [A,B]=losers;
   // punto de partida de la animación: su nodo de semis (coordenadas fijas)
-  const fA = animate? stageToSvg(pos[3][state[3].indexOf(A)]) : null;
-  const fB = animate? stageToSvg(pos[3][state[3].indexOf(B)]) : null;
+  const iA=state[3].indexOf(A), iB=state[3].indexOf(B);
+  const fA = (animate && iA>=0)? stageToSvg(pos[3][iA]) : null;
+  const fB = (animate && iB>=0)? stageToSvg(pos[3][iB]) : null;
   const ga=cornerFlag(A,XA,Y,D,fA), gb=cornerFlag(B,XB,Y,D,fB);
+  if(losers.pred){ ga.classList.add("pred"); gb.classList.add("pred"); }
   if(tp){
     const sc=el("text",{x:130,y:Y+46,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${tp.score[0]}–${tp.score[1]}`;
     const winA = CODE2IDX[tp.adv]===A;
@@ -643,13 +717,28 @@ function renderThird(animate){
     const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
     const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
   } else {
-    const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
+    // slot de medalla: arrastra la bandera de tu candidato al bronce
+    bronzeSlotEl=el("circle",{cx:130,cy:946,r:13,class:"slot"},$third);
+    const mg=el("text",{x:130,y:947,"font-size":"12","text-anchor":"middle","dominant-baseline":"central",opacity:".65"},$third); mg.textContent="🥉";
+    const pk = predictions["3P"]!=null ? CODE2IDX[predictions["3P"]] : null;
+    if(pk!=null && (pk===A || pk===B)){
+      const winA = pk===A;
+      (winA? ga : gb).classList.add("pred");
+      const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
+      const i2=el("text",{x:130,y:977,class:"p3info","text-anchor":"middle"},$third); i2.textContent="tu predicción";
+    } else {
+      const i2=el("text",{x:130,y:977,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07 · arrastra al 🥉";
+    }
+    ga.addEventListener("pointerdown",ev=>bronzePointerDown(ev,A,XA,Y));
+    gb.addEventListener("pointerdown",ev=>bronzePointerDown(ev,B,XB,Y));
   }
 }
 
 // ---- ABRIR / CERRAR FICHA ----
 function openCard(teamIdx){
   highlightPath(teamIdx);
+  const i0=state[0].indexOf(teamIdx);
+  if(i0>=0) rotateTo(-pos[0][i0].ang);
   const t=TEAMS[teamIdx], p=PROFILES[t[0]];
   $card.innerHTML=`
     <button class="close" aria-label="Cerrar">✕</button>
@@ -898,6 +987,12 @@ function prunePredictions(){
   while(changed){
     changed=false;
     for(const key in predictions){
+      if(key==="3P"){
+        const ti=CODE2IDX[predictions[key]];
+        const L=semiLosers();
+        if(MATCHES["3P"] || !L || (L[0]!==ti && L[1]!==ti)){ delete predictions[key]; changed=true; }
+        continue;
+      }
       const [r,m]=key.split("-").map(Number);
       if(MATCHES[key] || state[r+1][m]!=null){ delete predictions[key]; changed=true; continue; }
       const ti=CODE2IDX[predictions[key]];
@@ -940,8 +1035,8 @@ function toStage(ev){
   const ry=(x*Math.sin(a)+y*Math.cos(a))/zoom;
   return {x:rx+CX, y:ry+CY};
 }
-function makeGhost(teamIdx,diam){
-  const t=TEAMS[teamIdx], g=el("g",{class:"ghost"},$stage);
+function makeGhost(teamIdx,diam,parent){
+  const t=TEAMS[teamIdx], g=el("g",{class:"ghost"},parent||$stage);
   const r=diam/2;
   el("circle",{r:r,fill:"var(--bg-flag)"},g);
   const img=el("image",{x:-r,y:-r,width:diam,height:diam},g);
@@ -961,6 +1056,7 @@ function flagPointerDown(ev,teamIdx){
     }
   }
   ev.stopPropagation();
+  cancelAnimationFrame(rotAnim);
   moved=false;
   let canDrag = (dr>=0 && dr<RINGS-1);
   let tr=-1, tm=-1;
@@ -1020,6 +1116,21 @@ function pointerAngle(ev){
   const vy=(ev.clientY-r.top)/r.height*1000;
   return Math.atan2(vy-CY,vx-CX)*180/Math.PI;
 }
+let rotAnim=null;
+function rotateTo(target){
+  // gira la rueda por el camino corto hasta dejar el objetivo arriba
+  if(reduced){ rot=target; applyStage(); return; }
+  cancelAnimationFrame(rotAnim);
+  const start=rot;
+  const d=((target-start)%360+540)%360-180;
+  const t0=performance.now(), dur=650;
+  const step=now=>{
+    const k=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-k,3);
+    rot=start+d*e; applyStage();
+    if(k<1) rotAnim=requestAnimationFrame(step);
+  };
+  rotAnim=requestAnimationFrame(step);
+}
 function applyStage(){
   $stage.setAttribute("transform",
     `translate(${CX} ${CY}) rotate(${rot}) scale(${zoom}) translate(${-CX} ${-CY})`);
@@ -1030,10 +1141,12 @@ function applyStage(){
   if(g) g.setAttribute("transform",`rotate(${-rot} ${CX} ${CY})`);
 }
 $svg.addEventListener("pointerdown",ev=>{
+  cancelAnimationFrame(rotAnim);
   dragging=true; moved=false; lastAng=pointerAngle(ev);
   $svg.classList.add("dragging"); $svg.setPointerCapture(ev.pointerId);
 });
 $svg.addEventListener("pointermove",ev=>{
+  if(bdrag){ bronzeMove(ev); return; }
   if(fdrag){ flagMove(ev); return; }
   if(!dragging) return;
   const a=pointerAngle(ev);
@@ -1043,8 +1156,8 @@ $svg.addEventListener("pointermove",ev=>{
   rot+=d; lastAng=a; applyStage();
 });
 function endDrag(){ dragging=false; $svg.classList.remove("dragging"); }
-$svg.addEventListener("pointerup",ev=>{ if(fdrag){ flagUp(ev); return; } endDrag(); });
-$svg.addEventListener("pointercancel",()=>{ if(fdrag){ flagCancel(); return; } endDrag(); });
+$svg.addEventListener("pointerup",ev=>{ if(bdrag){ bronzeUp(ev); return; } if(fdrag){ flagUp(ev); return; } endDrag(); });
+$svg.addEventListener("pointercancel",()=>{ if(bdrag){ bronzeCancel(); return; } if(fdrag){ flagCancel(); return; } endDrag(); });
 $svg.addEventListener("wheel",ev=>{
   ev.preventDefault();
   zoom*= (ev.deltaY<0?1.12:0.89);
