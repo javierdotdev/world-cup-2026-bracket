@@ -12,11 +12,11 @@
     --dim:#BDB6A8;         /* eliminado / atenuado */
     --gold:#C8A24B;        /* acento único: campeón / trofeo */
     --bg-flag:#D6D0C4;     /* respaldo si una bandera no carga */
-    --muted:var(--muted);       /* textos secundarios */
-    --faint:var(--faint);       /* etiquetas de ronda */
-    --flaglab:var(--flaglab);     /* código de país (fallback) */
-    --slotline:var(--slotline);    /* huecos punteados */
-    --hairline:var(--hairline);    /* separadores */
+    --muted:#8a8478;       /* textos secundarios */
+    --faint:#b6af9f;       /* etiquetas de ronda */
+    --flaglab:#5a5448;     /* código de país (fallback) */
+    --slotline:#b9b2a4;    /* huecos punteados */
+    --hairline:#d8d2c5;    /* separadores */
     --pill-dim-bg:#cfc9bd; --pill-dim-fg:#544f44; --pill-dim-bd:#a7a092;
   }
   body.dark{
@@ -28,10 +28,11 @@
     --muted:#9a927c;
     --faint:#5f594a;
     --flaglab:#b8b09a;
-    --slotline:#565040;
+    --slotline:#7a725c;
     --hairline:#3a362c;
     --pill-dim-bg:#3a362c; --pill-dim-fg:#b6ae99; --pill-dim-bd:#565040;
   }
+  body.dark .slot{stroke-width:1.7}
   *{box-sizing:border-box}
   html,body{margin:0;height:100%}
   body{
@@ -558,7 +559,7 @@ const SCHEDULE={
 };
 function pendingHTML(teamIdx){
   const tl=semiLosers();
-  if(tl && !MATCHES["3P"] && (tl[0]===teamIdx || tl[1]===teamIdx)){
+  if(tl && !MATCHES["3P"] && simThird==null && (tl[0]===teamIdx || tl[1]===teamIdx)){
     const opp = tl[0]===teamIdx? tl[1] : tl[0];
     return `<div class="row"><span class="k">Próximo partido</span><br>3er puesto vs ${TEAMS[opp][2]} · Sáb 18/07</div>`;
   }
@@ -574,31 +575,45 @@ function pendingHTML(teamIdx){
 }
 
 // ---- 3ER PUESTO (perdedores de semis) ----
+let simThird=null;   // 🥉 simulado (transitorio, jamás toca MATCHES)
 function semiLosers(){
+  // los perdedores se derivan del ESTADO: funciona con semis reales o simuladas
   const out=[];
-  for(const [k,m] of [["3-0",0],["3-1",1]]){
-    const md=MATCHES[k]; if(!md) return null;
-    const a=state[3][2*m], b=state[3][2*m+1];
-    if(a==null||b==null) return null;
-    out.push(CODE2IDX[md.adv]===a ? b : a);
+  for(let m=0;m<2;m++){
+    const a=state[3][2*m], b=state[3][2*m+1], w=state[4][m];
+    if(a==null||b==null||w==null) return null;
+    out.push(w===a ? b : a);
   }
   return out;
 }
-function cornerFlag(teamIdx,x,y,diam){
+function stageToSvg(pt){
+  // coordenadas del stage (rotado/zoomeado) → coordenadas fijas del SVG
+  const a=rot*Math.PI/180;
+  const dx=(pt.x-CX)*zoom, dy=(pt.y-CY)*zoom;
+  return {x:CX+dx*Math.cos(a)-dy*Math.sin(a), y:CY+dx*Math.sin(a)+dy*Math.cos(a)};
+}
+function cornerFlag(teamIdx,x,y,diam,fromPt){
   const t=TEAMS[teamIdx];
   const g=el("g",{class:"node",transform:`translate(${x} ${y})`},$third);
+  const an=el("g",{class:"anim"},g);
   const r=diam/2;
-  el("circle",{r:r,fill:"var(--bg-flag)"},g);
-  const lab=el("text",{class:"flaglabel","text-anchor":"middle","dominant-baseline":"central","font-size":r*0.6,y:1},g);
+  el("circle",{r:r,fill:"var(--bg-flag)"},an);
+  const lab=el("text",{class:"flaglabel","text-anchor":"middle","dominant-baseline":"central","font-size":r*0.6,y:1},an);
   lab.textContent=t[1];
-  const img=el("image",{x:-r,y:-r,width:diam,height:diam},g);
+  const img=el("image",{x:-r,y:-r,width:diam,height:diam},an);
   setFlag(img,t[0]);
-  el("circle",{r:r,fill:"none",stroke:"var(--ink)","stroke-width":1.5,class:"ring"},g);
+  el("circle",{r:r,fill:"none",stroke:"var(--ink)","stroke-width":1.5,class:"ring"},an);
   const ttl=document.createElementNS(SVGNS,"title"); ttl.textContent=t[2]; g.appendChild(ttl);
   g.addEventListener("click",()=>openCard(teamIdx));
+  if(fromPt && !reduced){
+    an.setAttribute("transform",`translate(${(fromPt.x-x).toFixed(1)} ${(fromPt.y-y).toFixed(1)}) scale(.78)`);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      an.setAttribute("transform","translate(0 0) scale(1)");
+    }));
+  }
   return g;
 }
-function renderThird(){
+function renderThird(animate){
   $third.innerHTML="";
   const Y=902, XA=92, XB=168, D=46;
   const tt=el("text",{x:130,y:852,class:"p3label","text-anchor":"middle"},$third); tt.textContent="3ER PUESTO";
@@ -611,12 +626,20 @@ function renderThird(){
     return;
   }
   const [A,B]=losers;
-  const ga=cornerFlag(A,XA,Y,D), gb=cornerFlag(B,XB,Y,D);
+  // punto de partida de la animación: su nodo de semis (coordenadas fijas)
+  const fA = animate? stageToSvg(pos[3][state[3].indexOf(A)]) : null;
+  const fB = animate? stageToSvg(pos[3][state[3].indexOf(B)]) : null;
+  const ga=cornerFlag(A,XA,Y,D,fA), gb=cornerFlag(B,XB,Y,D,fB);
   if(tp){
     const sc=el("text",{x:130,y:Y+46,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${tp.score[0]}–${tp.score[1]}`;
     const winA = CODE2IDX[tp.adv]===A;
     (winA? gb : ga).classList.add("dim");
     const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
+  } else if(simThird!=null){
+    const winA = simThird===A;
+    (winA? gb : ga).classList.add("dim");
+    const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
+    const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
   } else {
     const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
   }
@@ -792,6 +815,7 @@ function applyRealResults(){
 // ---- SIMULAR EL RESTO (hipotético, desde el estado real actual) ----
 function playDemo(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
+  simThird=null;
   let t=300;
   for(let r=0;r<RINGS-1;r++){
     const matches=pos[r].length/2;
@@ -802,6 +826,15 @@ function playDemo(){
         }
       }
     }, t));
+    if(r===3){  // tras resolverse las semis: los perdedores se deslizan al rincón
+      demoTimers.push(setTimeout(()=>renderThird(true), t+950));
+    }
+    if(r===4 && !MATCHES["3P"]){  // tras la final: se decide el bronce simulado
+      demoTimers.push(setTimeout(()=>{
+        const L=semiLosers();
+        if(L){ simThird=L[(4+0)%2]; renderThird(); }
+      }, t+950));
+    }
     t += 1100;
   }
   demoTimers.push(setTimeout(renderPredictions, t+1600));
@@ -810,6 +843,7 @@ function playDemo(){
 const REAL_DONE = 2700 + Object.keys(MATCHES).length*340 + 1700;
 function resetBracket(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
+  simThird=null;
   state=freshState();
   const g=document.getElementById("champGlyph");
   if(g) g.style.display="";
