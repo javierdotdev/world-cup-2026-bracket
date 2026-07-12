@@ -1,10 +1,14 @@
 # 🏆 World Cup 2026 — Cuadro Radial Interactivo
 
+Una visualización **radial e interactiva** del cuadro de eliminatorias...
+
+[![Vista del cuadro radial](docs/preview.png)](https://javierdotdev.github.io/world-cup-2026-bracket)
+
 Una visualización **radial e interactiva** del cuadro de eliminatorias del Mundial 2026, construida con HTML, CSS, JavaScript y SVG puros — **sin frameworks ni build**. Un solo archivo `index.html`, listo para hostear en cualquier lado.
 
-> Los 48 equipos convergen desde el anillo exterior hacia el trofeo del centro. Cada resultado real hace que el ganador se **deslice** con animación hacia la siguiente ronda.
+> Los 32 equipos del knockout convergen desde el anillo exterior hacia el trofeo del centro. Cada resultado real hace que el ganador se **deslice** con animación hacia la siguiente ronda.
 
-**[🔗 Demo en vivo](https://javierdotdev.github.io/world-cup-2026-bracket)** ← reemplaza con tu URL
+**[🔗 Demo en vivo](https://javierdotdev.github.io/world-cup-2026-bracket)**
 
 ---
 
@@ -22,6 +26,14 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Girar y hacer zoom** — arrastra el fondo para rotar la rueda; las banderas y el trofeo se mantienen derechos.
 - **Banderas con doble fuente** — CDN (circle-flags) con copia incrustada de respaldo: funciona hasta sin internet.
 - **Responsive** — se adapta a escritorio y móvil.
+
+---
+
+## 🕹️ Cómo usar
+
+- **Gira** arrastrando el fondo · **zoom** con la rueda o pellizco.
+- **Toca una bandera** para abrir su ficha (perfil, partido, pick, próximo rival).
+- **Arrastra una bandera** a su siguiente nodo para registrar tu predicción (borde dorado punteado). Arrástrala fuera para quitarla, o usa *✕ Limpiar predicciones*.
 
 ---
 
@@ -71,6 +83,12 @@ Para cargar un resultado nuevo, agrega una línea a `MATCHES` (ej. `"2-0": {scor
 ## 🧩 ¿Reutilizable como template?
 
 Sí. Sirve para cualquier torneo de eliminación directa (fútbol local, esports, torneos de empresa). Basta cambiar `TEAMS`, `MATCHES` y los perfiles. Para adaptarlo a otro número de equipos hay que ajustar los radios de los anillos en `RADII`.
+
+---
+
+## 🗺️ Roadmap (v2)
+
+La siguiente evolución: el **torneo completo de 48 equipos** en un solo gráfico — un cinturón exterior de 12 grupos cuyas mini-tablas se actualizan por jornada, y cuyos clasificados se deslizan al anillo de 32avos al cerrar la fase. Los mockups del concepto están en [`docs/`](docs/).
 
 ---
 
