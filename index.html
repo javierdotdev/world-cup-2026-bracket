@@ -306,9 +306,11 @@ const RADII=[440,350,262,178,98,0];        // anillos 0..5 (5 = campeón, centro
 const DIAM =[58,50,42,36,32,96];           // diámetro del nodo por anillo
 const RINGS=6;
 
-// Calcula ángulo (grados, 0=arriba) de cada posición en cada anillo
+// Calcula ángulo (grados, 0=arriba) de cada posición en cada anillo.
+// El anillo exterior arranca con MEDIO paso de offset: así la cascada de promedios
+// queda centrada (semis en 45/135/225/315 y final horizontal, sin inclinación).
 const pos = [];
-pos[0] = TEAMS.map((_,i)=>({ang: i*360/N}));
+pos[0] = TEAMS.map((_,i)=>({ang: (i+0.5)*360/N}));
 for(let r=1;r<RINGS;r++){
   const count = N/Math.pow(2,r);
   pos[r] = [];
