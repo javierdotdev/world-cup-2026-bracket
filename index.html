@@ -182,7 +182,7 @@
 <body>
   <header>
     <h1>World Cup 2026</h1>
-    <p class="sub">Cuadro radial · 32avos → Campeón</p>
+    <p class="sub">Cuadro radial · Dieciseisavos → Campeón</p>
     <div class="controls">
       <button id="play">▶ Simular el resto</button>
       <button id="reset">↺ Estado real</button>
@@ -225,7 +225,7 @@ const XLINK="http://www.w3.org/1999/xlink";
 // ---- DATOS BASE (fuente de verdad). Orden horario desde arriba. ----
 // [codigo ISO, etiqueta FIFA, nombre]
 const TEAMS = [
-  // Orden = estructura REAL del cuadro (32avos → octavos → CUARTOS → semis oficiales).
+  // Orden = estructura REAL del cuadro (dieciseisavos → octavos → CUARTOS → semis oficiales).
   ["za","RSA","Sudáfrica"], ["ca","CAN","Canadá"],
   ["nl","NED","Países Bajos"], ["ma","MAR","Marruecos"],
   ["de","GER","Alemania"], ["py","PAR","Paraguay"],
@@ -475,7 +475,7 @@ function koRecord(teamIdx){
   return {w,pen};
 }
 function getProgress(teamIdx){
-  const names=["32avos","Octavos","Cuartos","Semis","Final","Campeón"];
+  const names=["Dieciseisavos","Octavos","Cuartos","Semis","Final","Campeón"];
   let deepest=0;
   for(let r=0;r<RINGS;r++) if(state[r].includes(teamIdx)) deepest=r;
   const wins=deepest;
@@ -523,7 +523,7 @@ function matchHTML(teamIdx){
   if(!mm) return "";
   const na=TEAMS[mm.a][2], nb=TEAMS[mm.b][2];
   const [ga,gb]=mm.md.score;
-  const RNAMES=["32avos","Octavos","Cuartos","Semis","Final"];
+  const RNAMES=["Dieciseisavos","Octavos","Cuartos","Semis","Final"];
   let head=`${na} ${ga}–${gb} ${nb}`;
   if(mm.md.pen) head += ` · ${TEAMS[CODE2IDX[mm.md.adv]][2]} por penales`;
   if(mm.md.aet) head += ` · definido en el alargue`;
@@ -542,7 +542,7 @@ function matchHTML(teamIdx){
 
 // ---- ETIQUETAS DE RONDA (texto curvo entre anillos) ----
 function drawRingLabels(){
-  const names=["32AVOS","OCTAVOS","CUARTOS","SEMIS","FINAL"];
+  const names=["DIECISEISAVOS","OCTAVOS","CUARTOS","SEMIS","FINAL"];
   const $rl=document.getElementById("ringlabels");
   names.forEach((nm,r)=>{
     const rad=(RADII[r]+RADII[r+1])/2 + 6;
@@ -791,7 +791,7 @@ function render(){
   uprights=[];
   flagEls=[];
   for(let r=0;r<RINGS;r++) flagEls[r]=[];
-  const labels=["32avos","Octavos","Cuartos","Semis","Final","Campeón"];
+  const labels=["Dieciseisavos","Octavos","Cuartos","Semis","Final","Campeón"];
 
   // anillo 0: las 32 banderas
   state[0].forEach((teamIdx,i)=>{
@@ -825,7 +825,7 @@ function advance(r,m,which){
 
   const from=pos[r][childIdx], to=pos[r+1][m];
   const isChampRound = (r+1===RINGS-1);
-  const labels=["32avos","Octavos","Cuartos","Semis","Final","Campeón"];
+  const labels=["Dieciseisavos","Octavos","Cuartos","Semis","Final","Campeón"];
   const f=makeFlag(teamIdx, DIAM[r+1], null, labels[r+1]);
   f.wrap.setAttribute("transform",`translate(${to.x} ${to.y})`);
   $flags.appendChild(f.wrap);
@@ -1190,5 +1190,7 @@ render();
 applyRealResults();
 setTimeout(loadPredictions, REAL_DONE);
 </script>
+<!-- Analytics: GoatCounter (sin cookies, liviano) -->
+<script data-goatcounter="https://javierdotdev.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

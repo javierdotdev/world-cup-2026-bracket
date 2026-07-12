@@ -14,7 +14,7 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 
 ## ✨ Características
 
-- **Cuadro radial 360°** — de 32avos al campeón, con líneas en ángulo recto estilo bracket clásico.
+- **Cuadro radial 360°** — de dieciseisavos al campeón, con líneas en ángulo recto estilo bracket clásico.
 - **Animación de avance** — al cargar, los clasificados se deslizan a su ronda real.
 - **Ficha por equipo** — toca una bandera y abre un panel con:
   - Nivel, tipo de favorito y riesgo (perfil estratégico)
@@ -92,7 +92,7 @@ Sí. Sirve para cualquier torneo de eliminación directa (fútbol local, esports
 
 ## 🗺️ Roadmap (v2)
 
-La siguiente evolución: el **torneo completo de 48 equipos** en un solo gráfico — un cinturón exterior de 12 grupos cuyas mini-tablas se actualizan por jornada, y cuyos clasificados se deslizan al anillo de 32avos al cerrar la fase. Los mockups del concepto están en [`docs/`](docs/).
+La siguiente evolución: el **torneo completo de 48 equipos** en un solo gráfico — un cinturón exterior de 12 grupos cuyas mini-tablas se actualizan por jornada, y cuyos clasificados se deslizan al anillo de dieciseisavos al cerrar la fase. Los mockups del concepto están en [`docs/`](docs/).
 
 ---
 
