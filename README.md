@@ -24,11 +24,13 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Ruta iluminada** — resalta el camino de un equipo hacia el título.
 - **Predicciones temporales** — arrastra una bandera a su siguiente nodo para predecir; se guardan en tu navegador y **nunca alteran los datos reales**.
 - **Girar y hacer zoom** — arrastra el fondo para rotar la rueda; las banderas y el trofeo se mantienen derechos.
-- **3er puesto** — mini-cruce dedicado para los perdedores de semis, con ficha, pick y medalla 🥉 al ganador.
-- **Simulación hasta el podio** — un botón simula el resto del torneo (campeón y 3er/4to lugar incluidos) sin tocar los datos reales; *Estado real* lo revierte.
+- **Panel de resultados 📋** — todos los partidos por ronda con marcador, penales/alargue, el pick de cada uno y el total de puntos de la quiniela.
+- **3er puesto** — mini-cruce dedicado para los perdedores de semis, con ficha, pick, medalla 🥉 al ganador y **predicción del bronce** arrastrando al slot de medalla.
+- **Simulación hasta el podio** — un botón simula el resto del torneo (campeón y 3er/4to lugar incluidos) sin tocar los datos reales; lo hipotético se dibuja con **anillo punteado** y *Estado real* lo revierte.
 - **Modo oscuro** — toggle 🌙/☀️ con preferencia guardada en el navegador.
 - **Banderas con doble fuente** — CDN (circle-flags) con copia incrustada de respaldo: funciona hasta sin internet.
-- **Responsive** — se adapta a escritorio y móvil.
+- **UX de foco** — al tocar un equipo, la rueda rota sola para dejar su rama visible; la ficha es panel lateral en escritorio y hoja compacta en móvil.
+- **Responsive y multiplataforma** — probado en Android, iOS/Safari (filtros SVG nativos), escritorio y móvil.
 
 ---
 
@@ -37,7 +39,8 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Gira** arrastrando el fondo · **zoom** con la rueda o pellizco.
 - **Toca una bandera** para abrir su ficha (perfil, partido, pick, próximo rival).
 - **Arrastra una bandera** a su siguiente nodo para registrar tu predicción (borde dorado punteado). Arrástrala fuera para quitarla, o usa *✕ Limpiar predicciones*.
-- **▶ Simular el resto** juega hipotéticamente lo que falta (hasta el bronce) · **↺ Estado real** vuelve a la verdad · **🌙/☀️** cambia el tema.
+- **▶ Simular el resto** juega hipotéticamente lo que falta (hasta el bronce) · **↺ Estado real** vuelve a la verdad · **📋 Resultados** lista todos los marcadores · **🌙/☀️** cambia el tema.
+- En el rincón del **3er puesto**, arrastra tu candidato al slot 🥉 para predecir el bronce.
 
 ---
 
@@ -81,6 +84,8 @@ Todo vive en `index.html`. Los datos son objetos JavaScript al inicio del `<scri
 - `GROUPWINS` — victorias en fase de grupos.
 
 Para cargar un resultado nuevo, agrega una línea a `MATCHES` (ej. `"2-0": {score:[1,0], adv:"ma", pick:[1,1], pts:3}`) y el ganador se anima solo a la siguiente ronda. El partido por el 3er puesto usa la clave especial `"3P"` (los participantes se derivan solos de los perdedores de semis).
+
+> **Nota:** el `index.html` publicado incluye un script de analytics ligero y sin cookies (GoatCounter) al final del archivo. Si reutilizas el template, cámbialo por tu propio código o elimínalo.
 
 ---
 
