@@ -344,7 +344,7 @@ const GROUPWINS = {"jp":1,"ci":2,"no":2,"mx":3,"ec":1,"gb-eng":2,"cd":1,"ar":3,"
 // ---- GEOMETRÍA POLAR ----
 const CX=500, CY=500, N=32;
 const RADII=[440,350,262,178,98,0];        // anillos 0..5 (5 = campeón, centro)
-const DIAM =[58,50,42,36,32,96];           // diámetro del nodo por anillo
+const DIAM =[44,50,58,64,70,96];           // diámetro por anillo: CRECE hacia el título (crescendo)
 const RINGS=6;
 
 // Calcula ángulo (grados, 0=arriba) de cada posición en cada anillo.
@@ -658,7 +658,7 @@ function bronzeUp(ev){
   if(b.ghost) b.ghost.remove();
   if(bronzeSlotEl) bronzeSlotEl.classList.remove("target");
   const p=svgPointFixed(ev);
-  const hit = Math.hypot(p.x-130, p.y-946) <= 34;    // soltó sobre el slot 🥉
+  const hit = Math.hypot(p.x-130, p.y-954) <= 34;    // soltó sobre el slot 🥉
   const code=TEAMS[b.teamIdx][0];
   if(hit) predictions["3P"]=code;
   else if(predictions["3P"]===code) delete predictions["3P"];  // arrastrar fuera = quitar
@@ -700,14 +700,14 @@ function cornerFlag(teamIdx,x,y,diam,fromPt){
 function renderThird(animate){
   $third.innerHTML="";
   bronzeSlotEl=null;
-  const Y=902, XA=92, XB=168, D=46;
+  const Y=900, XA=86, XB=174, D=54;
   const tt=el("text",{x:130,y:852,class:"p3label","text-anchor":"middle"},$third); tt.textContent="3ER PUESTO";
   const losers=semiLosers(), tp=MATCHES["3P"];
   const vs=el("text",{x:130,y:Y+1,class:"p3vs","text-anchor":"middle","dominant-baseline":"central"},$third); vs.textContent="vs";
   if(!losers){
     [XA,XB].forEach(x=>el("circle",{cx:x,cy:Y,r:D/2,class:"slot"},$third));
-    const i1=el("text",{x:130,y:Y+44,class:"p3info","text-anchor":"middle"},$third); i1.textContent="perdedores de semis";
-    const i2=el("text",{x:130,y:Y+61,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
+    const i1=el("text",{x:130,y:Y+48,class:"p3info","text-anchor":"middle"},$third); i1.textContent="perdedores de semis";
+    const i2=el("text",{x:130,y:Y+65,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07";
     return;
   }
   const [A,B]=losers;
@@ -718,27 +718,27 @@ function renderThird(animate){
   const ga=cornerFlag(A,XA,Y,D,fA), gb=cornerFlag(B,XB,Y,D,fB);
   if(losers.pred){ ga.classList.add("pred"); gb.classList.add("pred"); }
   if(tp){
-    const sc=el("text",{x:130,y:Y+46,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${tp.score[0]}–${tp.score[1]}`;
+    const sc=el("text",{x:130,y:Y+50,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${tp.score[0]}–${tp.score[1]}`;
     const winA = CODE2IDX[tp.adv]===A;
     (winA? gb : ga).classList.add("dim");
-    const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
+    const med=el("text",{x:(winA?XA:XB)+18,y:Y-20,"font-size":"16"},$third); med.textContent="🥉";
   } else if(simThird!=null){
     const winA = simThird===A;
     (winA? gb : ga).classList.add("dim");
-    const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
-    const i2=el("text",{x:130,y:Y+46,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
+    const med=el("text",{x:(winA?XA:XB)+18,y:Y-20,"font-size":"16"},$third); med.textContent="🥉";
+    const i2=el("text",{x:130,y:Y+50,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
   } else {
     // slot de medalla: arrastra la bandera de tu candidato al bronce
-    bronzeSlotEl=el("circle",{cx:130,cy:946,r:13,class:"slot"},$third);
-    const mg=el("text",{x:130,y:947,"font-size":"12","text-anchor":"middle","dominant-baseline":"central",opacity:".65"},$third); mg.textContent="🥉";
+    bronzeSlotEl=el("circle",{cx:130,cy:954,r:13,class:"slot"},$third);
+    const mg=el("text",{x:130,y:955,"font-size":"12","text-anchor":"middle","dominant-baseline":"central",opacity:".65"},$third); mg.textContent="🥉";
     const pk = predictions["3P"]!=null ? CODE2IDX[predictions["3P"]] : null;
     if(pk!=null && (pk===A || pk===B)){
       const winA = pk===A;
       (winA? ga : gb).classList.add("pred");
-      const med=el("text",{x:(winA?XA:XB)+15,y:Y-17,"font-size":"16"},$third); med.textContent="🥉";
-      const i2=el("text",{x:130,y:977,class:"p3info","text-anchor":"middle"},$third); i2.textContent="tu predicción";
+      const med=el("text",{x:(winA?XA:XB)+18,y:Y-20,"font-size":"16"},$third); med.textContent="🥉";
+      const i2=el("text",{x:130,y:984,class:"p3info","text-anchor":"middle"},$third); i2.textContent="tu predicción";
     } else {
-      const i2=el("text",{x:130,y:977,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07 · arrastra al 🥉";
+      const i2=el("text",{x:130,y:984,class:"p3info","text-anchor":"middle"},$third); i2.textContent="Sáb 18/07 · arrastra al 🥉";
     }
     ga.addEventListener("pointerdown",ev=>bronzePointerDown(ev,A,XA,Y));
     gb.addEventListener("pointerdown",ev=>bronzePointerDown(ev,B,XB,Y));
