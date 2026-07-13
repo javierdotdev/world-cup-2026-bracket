@@ -194,7 +194,7 @@
     <h1>World Cup 2026</h1>
     <p class="sub">Cuadro radial · Dieciseisavos → Campeón</p>
     <div class="controls">
-      <button id="play">▶ Simular torneo</button>
+      <button id="play">▶ Simular hasta el campeón</button>
       <button id="reset" style="display:none">↺ Estado real</button>
       <button id="clearpred" style="display:none">✕ Limpiar predicciones</button>
       <button id="results">📋 Resultados</button>
@@ -497,6 +497,7 @@ function getProgress(teamIdx){
     if(nxt!=null && nxt!==teamIdx){eliminated=true; elimRound=names[deepest];}
   }
   if(deepest===RINGS-1) return `🏆 Campeón`;
+  if(eliminated && elimRound==="Final") return `🥈 Subcampeón del Mundial`;
   const tp3=MATCHES["3P"];
   if(eliminated && elimRound==="Semis" && tp3 && CODE2IDX[tp3.adv]===teamIdx) return `🥉 3er lugar del Mundial`;
   if(eliminated)        return `Eliminado en ${elimRound}`;
@@ -618,7 +619,7 @@ function pendingHTML(teamIdx){
 }
 
 // ---- 3ER PUESTO (perdedores de semis) ----
-let simThird=null;   // 🥉 simulado (transitorio, jamás toca MATCHES)
+let simThird=null, simScores={};   // 🥉 y marcadores simulados (transitorios, jamás tocan MATCHES)
 function semiLosers(){
   // perdedores derivados del estado EFECTIVO: sirve con semis reales, simuladas o PREDICHAS
   const out=[]; let anyPred=false;
@@ -726,7 +727,9 @@ function renderThird(animate){
     const winA = simThird===A;
     (winA? gb : ga).classList.add("dim");
     const med=el("text",{x:(winA?XA:XB)+18,y:Y-20,"font-size":"16"},$third); med.textContent="🥉";
-    const i2=el("text",{x:130,y:Y+50,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
+    const ss=simScores["3P"];
+    if(ss){ const sc=el("text",{x:130,y:Y+50,class:"p3score","text-anchor":"middle"},$third); sc.textContent=`${ss.score[0]}–${ss.score[1]}`; }
+    const i2=el("text",{x:130,y:984,class:"p3info","text-anchor":"middle"},$third); i2.textContent="simulación";
   } else {
     // slot de medalla: arrastra la bandera de tu candidato al bronce
     bronzeSlotEl=el("circle",{cx:130,cy:954,r:13,class:"slot"},$third);
@@ -758,11 +761,15 @@ function resultRow(key, a, b){
   const fa=a!=null?TEAMS[a]:null, fb=b!=null?TEAMS[b]:null;
   const img=t=>t?`<img class="rf" src="${flagURL(t[0])}" data-c="${t[0]}" onerror="this.onerror=null;this.src=EMBEDDED[this.dataset.c]||''" alt="">`:"";
   const nA=fa?fa[1]:"—", nB=fb?fb[1]:"—";
+  const ss = !md && simScores[key];
   let mid, note="";
   if(md){
     mid=`${md.score[0]}–${md.score[1]}`;
     if(md.pen) note=`${TEAMS[CODE2IDX[md.adv]][2]} por penales`;
     else if(md.aet) note="definido en el alargue";
+  } else if(ss){
+    mid=`${ss.score[0]}–${ss.score[1]}`;
+    note="simulación";
   } else {
     mid="vs";
     note=SCHEDULE[key] || "por definir";
@@ -774,23 +781,24 @@ function resultRow(key, a, b){
 }
 function openResults(){
   clearRoute();
-  const R=[["Dieciseisavos",0,16],["Octavos de final",1,8],["Cuartos de final",2,4],["Semifinales",3,2],["Final",4,1]];
   let html=`<button class="close" aria-label="Cerrar">✕</button>
-    <div class="top"><div><div class="nm">📋 Resultados</div><div class="meta">Eliminatorias · Mundial 2026</div></div></div>`;
+    <div class="top"><div><div class="nm">📋 Resultados</div><div class="meta">Eliminatorias · Mundial 2026 · de lo más reciente a lo más antiguo</div></div></div>`;
+  // total de la quiniela (independiente del orden de despliegue)
   let tot=0, played=0;
-  for(const [nm,r,cnt] of R){
-    html+=`<div class="rhead">${nm}</div>`;
-    for(let m=0;m<cnt;m++){
-      const key=`${r}-${m}`;
-      html+=resultRow(key, state[r][2*m], state[r][2*m+1]);
-      const md=MATCHES[key];
-      if(md && md.pick){ tot+=md.pts; played++; }
-    }
-  }
+  for(const k in MATCHES){ if(MATCHES[k].pick){ tot+=MATCHES[k].pts; played++; } }
+  // Final y 3er puesto primero, luego rondas en orden inverso
+  html+=`<div class="rhead">Final</div>`;
+  html+=resultRow("4-0", state[4][0], state[4][1]);
   html+=`<div class="rhead">3er puesto</div>`;
   const L=semiLosers();
   html+=resultRow("3P", L?L[0]:null, L?L[1]:null);
-  if(MATCHES["3P"] && MATCHES["3P"].pick){ tot+=MATCHES["3P"].pts; played++; }
+  const R=[["Semifinales",3,2],["Cuartos de final",2,4],["Octavos de final",1,8],["Dieciseisavos",0,16]];
+  for(const [nm,r,cnt] of R){
+    html+=`<div class="rhead">${nm}</div>`;
+    for(let m=0;m<cnt;m++){
+      html+=resultRow(`${r}-${m}`, state[r][2*m], state[r][2*m+1]);
+    }
+  }
   html+=`<div class="rtotal">Mi quiniela en eliminatorias: <b>${tot} pts</b> en ${played} partidos</div>`;
   $card.innerHTML=html;
   $card.querySelector(".close").addEventListener("click",closeCard);
@@ -867,11 +875,11 @@ function render(){
     // entrada: arranca en el centro y florece hacia afuera
     if(!reduced){
       f.anim.setAttribute("transform",`translate(${CX-p.x} ${CY-p.y}) scale(.4)`);
-      f.anim.style.transitionDelay=(i*40)+"ms";
+      f.anim.style.transitionDelay=(i*18)+"ms";
       requestAnimationFrame(()=>requestAnimationFrame(()=>{
         f.anim.setAttribute("transform","translate(0 0) scale(1)");
       }));
-      setTimeout(()=>{f.anim.style.transitionDelay="0ms";}, 2200+i*40);
+      setTimeout(()=>{f.anim.style.transitionDelay="0ms";}, 1800+i*18);
     }
   });
   applyStage();
@@ -890,7 +898,11 @@ function advance(r,m,which,sim){
   const isChampRound = (r+1===RINGS-1);
   const labels=["Dieciseisavos","Octavos","Cuartos","Semis","Final","Campeón"];
   const f=makeFlag(teamIdx, DIAM[r+1], null, labels[r+1]);
-  if(sim) f.wrap.classList.add("sim");
+  if(sim){
+    f.wrap.classList.add("sim");
+    const l=(r+m)%2;   // marcador simulado determinístico: 2-0 / 2-1
+    simScores[`${r}-${m}`]={score: which===0? [2,l] : [l,2], adv:TEAMS[teamIdx][0]};
+  }
   f.wrap.setAttribute("transform",`translate(${to.x} ${to.y})`);
   $flags.appendChild(f.wrap);
   flagEls[r+1][m]=f;
@@ -904,14 +916,19 @@ function advance(r,m,which,sim){
   }
   applyStage();
 
-  // atenuar al perdedor
+  // atenuar al perdedor (excepto en la final: el subcampeón es podio, no eliminado)
   const loser=flagEls[r][2*m+(1-which)];
-  if(loser) loser.wrap.classList.add("dim");
+  if(loser && !isChampRound) loser.wrap.classList.add("dim");
 
   // si es el campeón, esconder el trofeo y resaltar
   if(isChampRound){
     const g=document.getElementById("champGlyph");
     if(g) g.style.display="none";
+    // podio completo: copa reducida junto al campeón y plata al subcampeón
+    const bd=el("text",{x:DIAM[5]*0.46,y:DIAM[5]*0.46,"font-size":"26","text-anchor":"middle","dominant-baseline":"central"},f.up); bd.textContent="🏆";
+    if(loser){
+      const sv=el("text",{x:DIAM[r]*0.46,y:-DIAM[r]*0.46,"font-size":"18","text-anchor":"middle","dominant-baseline":"central"},loser.up); sv.textContent="🥈";
+    }
     setTimeout(()=>showInfo(`🏆 Campeón: ${TEAMS[teamIdx][2]}`),900);
   }
 }
@@ -963,14 +980,14 @@ function applyRealResults(){
       if(state[r+1][m]!=null) return;                 // ya aplicado
       const which = state[r][2*m]===CODE2IDX[adv] ? 0 : 1;
       advance(r,m,which);
-    }, 2700 + k*340));                                // tras la entrada, escalonado
+    }, 1400 + k*150));                                // tras la entrada, en oleadas solapadas
   });
 }
 
 // ---- SIMULAR EL RESTO (hipotético, desde el estado real actual) ----
 function playDemo(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
-  simThird=null;
+  simThird=null; simScores={};
   simActive=true; updateControls();
   let t=300;
   for(let r=0;r<RINGS-1;r++){
@@ -988,7 +1005,7 @@ function playDemo(){
     if(r===4 && !MATCHES["3P"]){  // tras la final: se decide el bronce simulado
       demoTimers.push(setTimeout(()=>{
         const L=semiLosers();
-        if(L){ simThird=L[(4+0)%2]; renderThird(); }
+        if(L){ simThird=L[0]; simScores["3P"]={score:[2,1], adv:TEAMS[simThird][0]}; renderThird(); }
       }, t+950));
     }
     t += 1100;
@@ -996,10 +1013,10 @@ function playDemo(){
   demoTimers.push(setTimeout(renderPredictions, t+1600));
 }
 // ---- VOLVER AL ESTADO REAL ----
-const REAL_DONE = 2700 + Object.keys(MATCHES).length*340 + 1700;
+const REAL_DONE = 1400 + Object.keys(MATCHES).length*150 + 1700;
 function resetBracket(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
-  simThird=null;
+  simThird=null; simScores={};
   simActive=false; updateControls();
   state=freshState();
   const g=document.getElementById("champGlyph");

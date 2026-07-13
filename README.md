@@ -14,7 +14,7 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 
 ## ✨ Características
 
-- **Cuadro radial 360°** — de dieciseisavos al campeón, con líneas en ángulo recto estilo bracket clásico.
+- **Cuadro radial 360°** — de dieciseisavos al campeón, con líneas de esquinas redondeadas y **banderas que crecen de ronda en ronda** hacia el trofeo (crescendo visual).
 - **Animación de avance** — al cargar, los clasificados se deslizan a su ronda real.
 - **Ficha por equipo** — toca una bandera y abre un panel con:
   - Nivel, tipo de favorito y riesgo (perfil estratégico)
@@ -24,9 +24,10 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Ruta iluminada** — resalta el camino de un equipo hacia el título.
 - **Predicciones temporales** — arrastra una bandera a su siguiente nodo para predecir; se guardan en tu navegador y **nunca alteran los datos reales**.
 - **Girar y hacer zoom** — arrastra el fondo para rotar la rueda; las banderas y el trofeo se mantienen derechos.
-- **Panel de resultados 📋** — todos los partidos por ronda con marcador, penales/alargue, el pick de cada uno y el total de puntos de la quiniela.
+- **Panel de resultados 📋** — todos los partidos con marcador, penales/alargue, el pick de cada uno y el total de puntos de la quiniela, ordenados **de lo más reciente a lo más antiguo**.
 - **3er puesto** — mini-cruce dedicado para los perdedores de semis, con ficha, pick, medalla 🥉 al ganador y **predicción del bronce** arrastrando al slot de medalla.
-- **Simulación hasta el podio** — un botón simula el resto del torneo (campeón y 3er/4to lugar incluidos) sin tocar los datos reales; lo hipotético se dibuja con **anillo punteado** y *Estado real* lo revierte.
+- **Simulación hasta el podio** — un botón simula el resto del torneo sin tocar los datos reales; lo hipotético se dibuja con **anillo punteado**, genera **marcadores simulados** (visibles también en la tabla) y *Estado real* lo revierte.
+- **Podio visual 🏆🥈🥉** — copa junto al campeón, plata al subcampeón (que **conserva su color**: solo lo eliminado queda en gris) y medalla de bronce en su rincón.
 - **Modo oscuro** — toggle 🌙/☀️ con preferencia guardada en el navegador.
 - **Banderas con doble fuente** — CDN (circle-flags) con copia incrustada de respaldo: funciona hasta sin internet.
 - **UX de foco** — al tocar un equipo, la rueda rota sola para dejar su rama visible; la ficha es panel lateral en escritorio y hoja compacta en móvil.
@@ -39,7 +40,8 @@ Una visualización **radial e interactiva** del cuadro de eliminatorias del Mund
 - **Gira** arrastrando el fondo · **zoom** con la rueda o pellizco.
 - **Toca una bandera** para abrir su ficha (perfil, partido, pick, próximo rival).
 - **Arrastra una bandera** a su siguiente nodo para registrar tu predicción (borde dorado punteado). Arrástrala fuera para quitarla, o usa *✕ Limpiar predicciones*.
-- **▶ Simular el resto** juega hipotéticamente lo que falta (hasta el bronce) · **↺ Estado real** vuelve a la verdad · **📋 Resultados** lista todos los marcadores · **🌙/☀️** cambia el tema.
+- **▶ Simular hasta el campeón** juega hipotéticamente lo que falta (podio incluido) · **📋 Resultados** lista todos los marcadores · **🌙/☀️** cambia el tema.
+- Los botones **✕ Limpiar predicciones** y **↺ Estado real** son contextuales: aparecen solo cuando tienen algo que hacer.
 - En el rincón del **3er puesto**, arrastra tu candidato al slot 🥉 para predecir el bronce.
 
 ---
