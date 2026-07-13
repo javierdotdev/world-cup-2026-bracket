@@ -194,9 +194,9 @@
     <h1>World Cup 2026</h1>
     <p class="sub">Cuadro radial · Dieciseisavos → Campeón</p>
     <div class="controls">
-      <button id="play">▶ Simular el resto</button>
-      <button id="reset">↺ Estado real</button>
-      <button id="clearpred">✕ Limpiar predicciones</button>
+      <button id="play">▶ Simular torneo</button>
+      <button id="reset" style="display:none">↺ Estado real</button>
+      <button id="clearpred" style="display:none">✕ Limpiar predicciones</button>
       <button id="results">📋 Resultados</button>
       <button id="theme">🌙 Oscuro</button>
       <span class="hint">Gira arrastrando el fondo · arrastra una bandera al siguiente nodo para predecir</span>
@@ -971,6 +971,7 @@ function applyRealResults(){
 function playDemo(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
   simThird=null;
+  simActive=true; updateControls();
   let t=300;
   for(let r=0;r<RINGS-1;r++){
     const matches=pos[r].length/2;
@@ -999,6 +1000,7 @@ const REAL_DONE = 2700 + Object.keys(MATCHES).length*340 + 1700;
 function resetBracket(){
   demoTimers.forEach(clearTimeout); demoTimers=[];
   simThird=null;
+  simActive=false; updateControls();
   state=freshState();
   const g=document.getElementById("champGlyph");
   if(g) g.style.display="";
@@ -1025,6 +1027,14 @@ const store={
 let predictions={};                 // clave "ronda-partido" → código del equipo predicho
 let slotEls=[];
 const PRED_KEY="wc26-pred";
+let simActive=false;
+function updateControls(){
+  // acciones contextuales: solo se muestran cuando tienen algo que hacer
+  const c=document.getElementById("clearpred");
+  if(c) c.style.display = Object.keys(predictions).length ? "" : "none";
+  const r=document.getElementById("reset");
+  if(r) r.style.display = simActive ? "" : "none";
+}
 function savePredictions(){ store.set(PRED_KEY, JSON.stringify(predictions)); }
 async function loadPredictions(){
   try{ const v=await store.get(PRED_KEY); predictions = v? (JSON.parse(v)||{}) : {}; }
@@ -1088,6 +1098,7 @@ function renderPredictions(){
   }
   renderThird();
   applyStage();
+  updateControls();
 }
 
 // Pointer → coordenadas del stage (deshace rotación y zoom)
@@ -1241,6 +1252,7 @@ document.getElementById("play").addEventListener("click",playDemo);
 document.getElementById("reset").addEventListener("click",resetBracket);
 document.getElementById("clearpred").addEventListener("click",()=>{
   predictions={}; savePredictions(); renderPredictions();
+  showInfo("Predicciones borradas ✓");
 });
 document.getElementById("results").addEventListener("click",openResults);
 function setTheme(dark){
