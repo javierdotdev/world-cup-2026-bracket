@@ -599,7 +599,7 @@ const SCHEDULE={
   "1-0":"Sáb 04/07","1-1":"Sáb 04/07","1-2":"Dom 05/07","1-3":"Dom 05/07",
   "1-4":"Dom 05/07","1-5":"Dom 05/07","1-6":"Mar 07/07","1-7":"Mar 07/07",
   "2-1":"Vie 10/07","2-2":"Vie 10/07","2-3":"Sáb 11/07 · Kansas City",
-  "3-0":"Semifinal · Dallas 14/07","3-1":"Semifinal · HOY Mié 15/07","3P":"Sáb 18/07","4-0":"FINAL · 19/07"
+  "3-0":"Semifinal · Dallas 14/07","3-1":"Semifinal · 15/07","3P":"Sáb 18/07 · Francia vs Inglaterra","4-0":"FINAL · Dom 19/07"
 };
 function pendingHTML(teamIdx){
   const tl=semiLosers();
@@ -965,8 +965,9 @@ const MATCHES = {
   "2-2": {score:[1,2], adv:"gb-eng", aet:true, pick:[2,1], pts:0}, // Noruega 1-2 Inglaterra (alargue)
   "2-3": {score:[3,1], adv:"ar", aet:true, pick:[1,0], pts:3},     // Argentina 3-1 Suiza (alargue)
   // --- Semifinales ---
-  "3-0": {score:[0,2], adv:"es", pick:[2,1], pts:0}                // Francia 0-2 España (Oyarzabal, Pedro Porro) → ESPAÑA A LA FINAL
-  // "3-1": Inglaterra vs Argentina (hoy 15/07) · "3P" 18/07 · "4-0" FINAL 19/07
+  "3-0": {score:[0,2], adv:"es", pick:[2,1], pts:0},               // Francia 0-2 España → ESPAÑA A LA FINAL
+  "3-1": {score:[1,2], adv:"ar", pick:[1,2], pts:6}                // Inglaterra 1-2 Argentina ⭐ exacto #13 → ARGENTINA A LA FINAL
+  // FINAL: España vs Argentina (Dom 19/07) · 3er puesto: Francia vs Inglaterra (Sáb 18/07)
   // "3-0": SF1 · "3-1": SF2 · "3P": 3er puesto (perdedores de semis, 18/07) · "4-0": FINAL 19/07
 };
 let demoTimers=[];
